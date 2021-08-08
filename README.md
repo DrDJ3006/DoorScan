@@ -25,7 +25,7 @@ You can select your target with the '-t' option.
 ```
 python3 DoorScan.py -t 192.168.1.1
 ```
-you can select the range of ports you want to scan with the '-r' option.
+You can select the range of ports you want to scan with the '-r' option.
 ```
 python3 DoorScan.py -t 192.168.1.1 -r 1-65535
 ```
