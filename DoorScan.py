@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-
 import logging
 from scapy.all import *
 from os import system, name
@@ -7,17 +6,12 @@ from math import *
 timeout_icmp = 3
 timeout_tcp = 0.2
 port_protcol = {20: 'ftp-data', 21: 'ftp', 22: 'ssh', 23: 'Telnet', 25: 'smtp', 53: 'dns', 67: 'DHCP-Client', 68: 'DHCP-Server', 69: 'tftp', 80: 'http', 110: 'pop3', 123: 'ntp', 137: 'netbios-ns', 143: 'imap4', 161: 'snmp', 162: 'snmp-trap', 389: 'ldap', 443: 'https', 445: 'cifs', 546: 'dhcp_v6', 993: 'imaps', 995: 'pop3s', 1433: 'Microsoft SQL Server', 1521: 'Oracle SQL', 3306: 'MySQL',5432: 'PostgreSQL',5900: 'VNC-Server',6667: 'irc'}
-
-
 def getProtocol(port):
     prtotocol = 'unknown'
     for ports in port_protcol:
         if int(port) == int(ports):
             prtotocol=port_protcol[ports]
     return prtotocol
-
-
-
 if len(sys.argv) < 2:
     print("No parameters selected, type '" + sys.argv[0] + " -h' for help")
     exit()
@@ -117,4 +111,3 @@ except PermissionError:
 except socket.gaierror:
     print("[x] Ip target invalid")
     exit()
-
