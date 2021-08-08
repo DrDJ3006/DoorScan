@@ -4,7 +4,6 @@ import logging
 from scapy.all import *
 from os import system, name
 from math import *
-
 timeout_icmp = 3
 timeout_tcp = 0.2
 port_protcol = {20: 'ftp-data', 21: 'ftp', 22: 'ssh', 23: 'Telnet', 25: 'smtp', 53: 'dns', 67: 'DHCP-Client', 68: 'DHCP-Server', 69: 'tftp', 80: 'http', 110: 'pop3', 123: 'ntp', 137: 'netbios-ns', 143: 'imap4', 161: 'snmp', 162: 'snmp-trap', 389: 'ldap', 443: 'https', 445: 'cifs', 546: 'dhcp_v6', 993: 'imaps', 995: 'pop3s', 1433: 'Microsoft SQL Server', 1521: 'Oracle SQL', 3306: 'MySQL',5432: 'PostgreSQL',5900: 'VNC-Server',6667: 'irc'}
@@ -33,19 +32,9 @@ else:
         print("[+] help list :")
         print("[*] -t for select the target")
         print("[*] -r for select the range of ports")
-        print("[*] -w for show how the TCP Scanning ports work")
         print("[*] Ex: PortsScan -t 192.168.1.254 (défault range 1 to 1024)")
         print("[*] Ex: PortsScan -t  192.168.1.254 -r 22 (u can use a single port)")
         print("[*] Ex: PortsScan -t 192.168.1.254 -r 1-65535 (it could take a while ...)")
-        exit()
-    elif sys.argv[1] == "-w":
-        print("A TCP connection works this way :")
-        print("  (PC) ===[SYN]==> (TARGET)")
-        print("  (PC) <===[SYN-ACK]== (TARGET)")
-        print("  (PC) ===[ACK]==> (TARGET)")
-        print("  The purpose of the Scanning TCP it's to send [SYN] packets")
-        print(
-            "  on all the port to the (TARGET) and check if the (TARGET) send back a [SYN-ACK] packet, it's simple =D.")
         exit()
     else:
         print("[x] Unknown parameter(s) '" + str(sys.argv[1]) + "' use '-h' for help")
