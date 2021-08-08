@@ -10,8 +10,6 @@ DoorScan is a simple Ports Scan using python and the library scapy.
 ## Dependencies :
 - Python 3.5+
 - Scapy 2.4.5+
-- Os
-- Math
 
 ## Installation :
 
