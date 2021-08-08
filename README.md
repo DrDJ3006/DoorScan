@@ -33,7 +33,6 @@ You can select the range of ports you want to scan with the '-r' option.
 ```
 python3 DoorScan.py -t 192.168.1.1 -r 1-65535
 ```
-
 # Bugs and problems : 
 Please if you find a problem, or a bug let me know =D.
 # legal disclaimer:
