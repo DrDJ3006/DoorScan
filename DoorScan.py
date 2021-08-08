@@ -27,7 +27,7 @@ else:
         print("[*] -t for select the target")
         print("[*] -r for select the range of ports")
         print("[*] Ex: PortsScan -t 192.168.1.254 (défault range 1 to 1024)")
-        print("[*] Ex: PortsScan -t  192.168.1.254 -r 22 (u can use a single port)")
+        print("[*] Ex: PortsScan -t 192.168.1.254 -r 22 (u can use a single port)")
         print("[*] Ex: PortsScan -t 192.168.1.254 -r 1-65535 (it could take a while ...)")
         exit()
     else:

@@ -2,7 +2,7 @@
 
 # DoorScan
 
-DoorScan is a simple Ports Scan using python and the library scapy.
+DoorScan is a simple Ports Scan using python and the scapy library
 
 
 # Installation & dependencies :
@@ -22,6 +22,7 @@ git clone https://github.com/DrDJ3006/DoorScan.git
 pip3 install -r requirements.txt
 ```
 ## Use :
+The script must be run as root
 ```
 python3 DoorScan.py
 ```
@@ -32,6 +33,10 @@ python3 DoorScan.py -t 192.168.1.1
 You can select the range of ports you want to scan with the '-r' option.
 ```
 python3 DoorScan.py -t 192.168.1.1 -r 1-65535
+```
+You can select a single port too .
+```
+python3 DoorScan.py -t 192.168.1.1 -r 443
 ```
 # Bugs and problems : 
 Please if you find a problem, or a bug let me know =D.
