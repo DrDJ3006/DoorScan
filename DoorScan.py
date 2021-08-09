@@ -1,35 +1,41 @@
 #!/usr/bin/python3
-import logging
 from scapy.all import *
 from os import system, name
 from math import *
 
-timeout_icmp = 3
+timeout_icmp = 3  # you can change the timeouts if u have a good or a bad connection
 timeout_tcp = 0.2
-port_protcol = {20: 'ftp-data', 21: 'ftp', 22: 'ssh', 23: 'Telnet', 25: 'smtp', 53: 'dns', 67: 'DHCP-Client',
+# creation and initialization of the list of protocols with their associated ports for the getPort() function
+port_protocol = {20: 'ftp-data', 21: 'ftp', 22: 'ssh', 23: 'Telnet', 25: 'smtp', 53: 'dns', 67: 'DHCP-Client',
                 68: 'DHCP-Server', 69: 'tftp', 80: 'http', 110: 'pop3', 123: 'ntp', 137: 'netbios-ns', 143: 'imap4',
                 161: 'snmp', 162: 'snmp-trap', 389: 'ldap', 443: 'https', 445: 'cifs', 546: 'dhcp_v6', 993: 'imaps',
                 995: 'pop3s', 1433: 'Microsoft SQL Server', 1521: 'Oracle SQL', 3306: 'MySQL', 5432: 'PostgreSQL',
                 5900: 'VNC-Server', 6667: 'irc'}
 
 
+# Definition of the function get ping()
 def getPing():
     icmp = IP(dst=target_ip) / ICMP()
-    resp = sr1(icmp, timeout=timeout_icmp, verbose=0)  # you can augment the timeout if u have a bad connection
-    if resp == None:
+    resp = sr1(icmp, timeout=timeout_icmp, verbose=0)
+    if resp is None:
         print("[*] (Host Unreachable with ICMP)")
 
 
+# Definition of the function get getProtocol()
 def getProtocol(port):
     protocol = 'unknown'
-    for ports in port_protcol:
+    for ports in port_protocol:
         if int(port) == int(ports):
-            protocol = port_protcol[ports]
+            protocol = port_protocol[ports]
     return protocol
 
 
+# Definition of the function get getTime()
 def getTime(timeout):
-    waiting_time = ceil((timeout * 1.5) * (scale - port))
+    waiting_time_min = 0
+    waiting_time_sc = 0
+    waiting_time_hour = 0
+    waiting_time = ceil((timeout) * (scale - port))
     if waiting_time / 3600 < 1:
         waiting_time_min = round(waiting_time / 60, 2)
         waiting_time_sc = round(round(waiting_time_min - round(waiting_time_min), 2) * 60)
@@ -48,6 +54,7 @@ def getTime(timeout):
             waiting_time_min) + "min " + str(waiting_time_sc) + "sc waiting)")
 
 
+# Definition of the function get portsScan()
 def portsScan(startingPort, endingPort, ip):
     openPorts = 0
     UnknownPorts = 0
@@ -71,10 +78,16 @@ def portsScan(startingPort, endingPort, ip):
             UnknownPorts) + " port(s) filtered/closed")
     except KeyboardInterrupt:
         print("\n[x] Ctrl + C Pressed, Exiting")
-        print("[+] TCP Scan Stopped " + str(portCount) + " port(s) scanned, " + str(openPorts) + " port(s) open, " + str(
-            UnknownPorts) + " port(s) filtered/closed")
+        print(
+            "[+] TCP Scan Stopped " + str(portCount) + " port(s) scanned, " + str(openPorts) + " port(s) open, " + str(
+                UnknownPorts) + " port(s) filtered/closed")
 
 
+# management of the different arguments
+ports = 0
+port = 0
+scale = 0
+target_ip = 0
 if len(sys.argv) < 2:
     print("No parameters selected, type '" + sys.argv[0] + " -h' for help")
     exit()
@@ -101,7 +114,7 @@ else:
             if sys.argv[3] == "-r":
                 ports = sys.argv[4].split('-', maxsplit=1)
                 if int(ports[0]) < 1:
-                    print("[x] starting port range cannot be under 0")
+                    print("[x] starting port range cannot be under 1")
                     exit()
                 elif int(ports[1]) > 65535:
                     print("[x] last port range cannot be over 65535")
@@ -112,11 +125,14 @@ else:
             else:
                 print("[x] Unknown parameter(s) '" + str(sys.argv[1]) + "' use '-h' for help")
                 exit()
-        except IndexError as e:
+        except IndexError:
             try:
                 port = int(ports[0])
                 scale = int(ports[0])
-            except NameError as e:
+            except NameError:
+                print("[x] Please select a range")
+                exit()
+            except TypeError:
                 print("[x] Please select a range")
                 exit()
     else:
@@ -124,10 +140,12 @@ else:
         scale = 1024
 
 try:
+    # calls functions
     getPing()
     getTime(timeout_tcp)
     portsScan(port, scale, target_ip)
 
+# management of different exceptions
 except PermissionError:
     print("[x] Please run the script as root")
     exit()
