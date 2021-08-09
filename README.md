@@ -12,7 +12,6 @@ DoorScan is a simple Ports Scan using python and the scapy library
 - Scapy 2.4.5+
 
 ## Installation :
-
 - Clone the github repo : 
 ```
 git clone https://github.com/DrDJ3006/DoorScan.git
