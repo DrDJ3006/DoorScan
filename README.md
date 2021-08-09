@@ -1,10 +1,8 @@
 
 
-# DoorScan
+# DoorScan :
 
 DoorScan is a simple Ports Scan using python and the scapy library
-
-
 # Installation & dependencies :
 
 ## Dependencies :
@@ -20,7 +18,7 @@ git clone https://github.com/DrDJ3006/DoorScan.git
 ```
 pip3 install -r requirements.txt
 ```
-## Use :
+# Use :
 The script must be run as root
 ```
 python3 DoorScan.py
