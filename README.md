@@ -22,11 +22,11 @@ The script must be run as root
 ```
 python3 DoorScan.py
 ```
-##ICMP Scan:
+### ICMP Scan:
 ```
 (not available for the moment)
 ``` 
-##ARP Scan:
+### ARP Scan:
 - Select a network to scan with '-n' 
 ``` 
 python3 DoorScan.py -ARP -n 192.168.1.0/24
@@ -35,7 +35,7 @@ python3 DoorScan.py -ARP -n 192.168.1.0/24
 ``` 
 python3 DoorScan.py -ARP -t 192.168.1.254
 ``` 
-##TCP (Ports) Scan:
+### TCP (Ports) Scan:
 - Select a target to scan with '-t' 
 ``` 
 python3 DoorScan.py -TCP -t 192.168.1.254 (default port scan 1 to 1024) 
