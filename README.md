@@ -30,7 +30,6 @@ python3 DoorScan.py
 - Select a network to scan with '-n' 
 ``` 
 python3 DoorScan.py -ARP -n 192.168.1.0/24
-
 ``` 
 - Select a single target to request with '-t'
 ``` 
