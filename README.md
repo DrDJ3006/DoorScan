@@ -2,7 +2,7 @@
 
 # DoorScan :
 
-DoorScan is a simple Ports Scan using python and the scapy library
+DoorScan is a simple Scan Script using python3 and the scapy library
 # Installation & dependencies :
 ## Dependencies :
 - Python 3.5+
@@ -22,18 +22,32 @@ The script must be run as root
 ```
 python3 DoorScan.py
 ```
-You can select your target with the '-t' option.
+###ICMP Scan:
 ```
-python3 DoorScan.py -t 192.168.1.1
-```
-You can select the range of ports you want to scan with the '-r' option.
-```
-python3 DoorScan.py -t 192.168.1.1 -r 1-65535
-```
-You can select a single port too .
-```
-python3 DoorScan.py -t 192.168.1.1 -r 443
-```
+(not available for the moment)
+``` 
+###ARP Scan:
+- Select a network to scan with '-n' 
+``` 
+python3 DoorScan.py -ARP -n 192.168.1.0/24
+``` 
+- Select a single target to request with '-t'
+``` 
+python3 DoorScan.py -ARP -t 192.168.1.254
+``` 
+###TCP (Ports) Scan:
+- Select a target to scan with '-t' 
+``` 
+python3 DoorScan.py -TCP -t 192.168.1.254 (default port scan 1 to 1024) 
+``` 
+- Select the port range to scan with '-r'
+``` 
+python3 DoorScan.py -TCP -t 192.168.1.254 -r 1-65535
+``` 
+- Select a single port to scan with '-p'
+``` 
+python3 DoorScan.py -TCP -t 192.168.1.254 -p 22
+``` 
 # Bugs and problems : 
 Please if you find a problem, or a bug let me know =D.
 # legal disclaimer:
