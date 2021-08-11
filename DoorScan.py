@@ -139,7 +139,7 @@ def ArpScan(network, timeout):
 
 try:
     if len(sys.argv) < 2:
-        print("No parameters selected, type '" + sys.argv[0] + " -h' for help")
+        print("No parameters selected, type 'DoorScan -h' for help")
         exit()
     else:
         if sys.argv[1] == '-h':
