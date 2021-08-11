@@ -17,7 +17,7 @@ timeout_arp = 7
 # creation and initialization of the list of protocols with their associated ports for the getPort() function
 port_protocol = {20: 'ftp-data', 21: 'ftp', 22: 'ssh', 23: 'Telnet', 25: 'smtp', 53: 'dns', 67: 'DHCP-Client',
                  68: 'DHCP-Server', 69: 'tftp', 80: 'http', 110: 'pop3', 123: 'ntp', 137: 'netbios-ns', 143: 'imap4',
-                 161: 'snmp', 162: 'snmp-trap', 389: 'ldap', 443: 'https', 445: 'cifs', 546: 'dhcp_v6', 993: 'imaps',
+                 161: 'snmp', 162: 'snmp-trap', 389: 'ldap', 443: 'https', 445: 'cifs', 546: 'dhcp_v6', 631: 'cups/ipp', 993: 'imaps',
                  995: 'pop3s', 1433: 'Microsoft SQL Server', 1521: 'Oracle SQL', 3306: 'MySQL', 5432: 'PostgreSQL',
                  5900: 'VNC-Server', 6667: 'irc'}
 
@@ -44,7 +44,7 @@ def getTime(startingPort, endingPort, timeout):
     waiting_time_min = 0
     waiting_time_sc = 0
     waiting_time_hour = 0
-    waiting_time = ceil(timeout * (int(endingPort) - int(startingPort)))
+    waiting_time = ceil(timeout *2* (int(endingPort) - int(startingPort)))
     if waiting_time / 3600 < 1:
         waiting_time_min = round(waiting_time / 60, 2)
         waiting_time_sc = round(round(waiting_time_min - round(waiting_time_min), 2) * 60)
@@ -120,10 +120,6 @@ def ArpScan(network, timeout):
     except ValueError:
         print("[x] Please input a mask 'X.X.X.0/mask'")
         exit()
-    network_ip_bytes = network_ip.split(".")
-    if network_ip_bytes[3] != '0':
-        print("[x] The network must end by a 0 'X.X.X.0/mask'")
-        exit()
     print("[+] ARP Scanning Network " + network)
     arp_r = ARP(pdst=network)
     br = Ether(dst='ff:ff:ff:ff:ff:ff')
@@ -193,12 +189,17 @@ try:
                             except IndexError:
                                 print("[x] Please input a port range after '-r' format: '1-65535' (scanning port 1 to "
                                       "65535)")
+                                exit()
                         elif sys.argv[4] == '-p':
                             try:
                                 firstPort = int(sys.argv[5])
                                 lastPort = int(sys.argv[5])
                             except IndexError:
                                 print("[x] Please input a port after '-p' ")
+                                exit()
+                            except ValueError:
+                                print("[x] Please input a port after '-p' ")
+                                exit()
                     except IndexError:
                         firstPort = 1
                         lastPort = 1024
