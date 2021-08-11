@@ -10,6 +10,7 @@ target_network_mask = 0
 ports = 0
 firstPort = 0
 lastPort = 0
+network_ip = 0
 timeout_icmp = 3  # you can change the timeouts if u have a good or a bad connection
 timeout_tcp = 0.2
 timeout_arp = 7
@@ -135,6 +136,7 @@ def ArpScan(network, timeout):
     else:
         print("[x] ARP Request End, no response(s) received from " + str(network))
 
+
 try:
     if len(sys.argv) < 2:
         print("No parameters selected, type '" + sys.argv[0] + " -h' for help")
@@ -150,7 +152,8 @@ try:
             print("   - Select a single target to request with '-t' Ex: '... -ARP -t 192.168.1.254'")
             print(" TCP (Ports) Scan:")
             print("   - Input '-TCP'")
-            print("   - Select a target to scan with '-t' Ex: '... -TCP -t 192.168.1.254' (default port scan 1 to 1024) ")
+            print(
+                "   - Select a target to scan with '-t' Ex: '... -TCP -t 192.168.1.254' (default port scan 1 to 1024) ")
             print("   - Select the port range to scan with '-r' Ex: '... -TCP -t 192.168.1.254 -r 1-65535'")
             print("   - Select a single port to scan with '-p' Ex: '... -TCP -t 192.168.1.254 -p 22'")
             exit()
