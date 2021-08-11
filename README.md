@@ -49,6 +49,10 @@ python3 DoorScan.py -TCP -t 192.168.1.254 -r 1-65535
 ``` 
 python3 DoorScan.py -TCP -t 192.168.1.254 -p 22
 ``` 
+- Select the fast scan with '-f'
+``` 
+python3 DoorScan.py -TCP -t 192.168.1.254 -f
+``` 
 # Bugs and problems : 
 Please if you find a problem, or a bug let me know =D.
 # legal disclaimer:
