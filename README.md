@@ -23,9 +23,11 @@ The script must be run as root
 python3 DoorScan.py
 ```
 ### ICMP Scan:
-```
-(not available for the moment)
+- Select a network to scan with '-n' 
 ``` 
+python3 DoorScan.py -ICMP -n 192.168.1.0/24
+```
+(if you want to scan your local network use ARP Scan instead it's faster =D )
 ### ARP Scan:
 - Select a network to scan with '-n' 
 ``` 
@@ -36,21 +38,22 @@ python3 DoorScan.py -ARP -n 192.168.1.0/24
 python3 DoorScan.py -ARP -t 192.168.1.254
 ``` 
 ### TCP (Ports) Scan:
+if you scan a target in your local network input a mask with the IP
 - Select a target to scan with '-t' 
 ``` 
-python3 DoorScan.py -TCP -t 192.168.1.254 (default port scan 1 to 1024) 
+python3 DoorScan.py -TCP -t 192.168.1.254/24 (default port scan 1 to 1024) 
 ``` 
 - Select the port range to scan with '-r'
 ``` 
-python3 DoorScan.py -TCP -t 192.168.1.254 -r 1-65535
+python3 DoorScan.py -TCP -t 192.168.1.254/24 -r 1-65535
 ``` 
 - Select a single port to scan with '-p'
 ``` 
-python3 DoorScan.py -TCP -t 192.168.1.254 -p 22
+python3 DoorScan.py -TCP -t 192.168.1.254/24 -p 22
 ``` 
 - Select the fast scan with '-f'
 ``` 
-python3 DoorScan.py -TCP -t 192.168.1.254 -f
+python3 DoorScan.py -TCP -t 192.168.1.254/24 -f
 ``` 
 # Bugs and problems : 
 Please if you find a problem, or a bug let me know =D.

@@ -2,47 +2,77 @@
 from scapy.all import *
 from os import system, name
 from math import *
+from ipaddress import *
+import random
+import socket
 
+self_ip = [ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][0]
 target_ip = 0
 target_network = 0
 target_network_ip = 0
+target_network_ip_bytes = 0
 target_network_mask = 0
 ports = 0
 firstPort = 0
 lastPort = 0
 network_ip = 0
-timeout_icmp = 3  # you can change the timeouts if u have a good or a bad connection
+# you can change the timeouts if u have a good or a bad connection
+timeout_icmp = 0.2
 timeout_tcp = 0.2
-timeout_arp = 7
+timeout_arp = 5
 # creation and initialization of the list of protocols with their associated ports for the getPort() function
 port_protocol_tcp = {1: 'tcpmux', 5: 'rje', 7: 'echo', 9: 'discard', 11: 'systat', 13: 'daytime', 17: 'qotd', 18: 'msp',
-                 19: 'chargen', 20: 'ftp-data', 21: 'ftp', 22: 'ssh', 23: 'Telnet', 25: 'smtp', 37: 'time', 39: 'rip',
-                 42: 'nameserver', 43: 'nicname', 49: 'tacacs', 50: 're-mail-ck', 53: 'domain', 70: 'gopher',
-                 71: 'genius', 79: 'finger', 80: 'http', 81: 'Torpark', 88: 'kerberos', 101: 'hostname',
-                 102: 'Iso-tsap', 105: 'csnet-ns', 107: 'rtelnet', 109: 'pop2', 110: 'pop3', 111: 'sunrpc', 115: 'auth',
-                 117: 'uucp-path', 119: 'nntp', 123: 'ntp', 137: ' netbios-ns ', 138: 'netbios-dgm', 139: 'netbios-ssn',
-                 143: 'imap', 162: 'snmptrap', 177: 'xdmcp', 179: 'bgp', 194: 'irc', 199: 'smux', 201: 'at-rtmp',
-                 209: 'qmtp', 210: 'z39.50', 213: 'ipx', 220: 'imap3', 369: 'rpc2portmap', 370: 'codaauth2',
-                 389: 'ldap', 427: 'svrloc', 443: 'https', 444: 'snpp', 445: ' microsoft-ds ', 464: 'kpasswd',
-                 512: 'exec', 513: 'login', 514: 'shell', 515: 'printer', 530: 'courier',
-                 531: 'conference', 532: 'netnews', 540: 'uucp', 543: 'klogin', 544: 'kshell', 547: 'dhcpv6-server',
-                 548: 'afpovertcp', 554: 'rtsp', 536: 'nntps', 587: 'submission', 631: 'ipp/cups',
-                 636: 'ldaps', 674: 'acap', 694: 'ha-cluster', 749: 'kerberos-adm', 873: 'rsync', 992: 'telnets',
-                 993: 'imaps', 995: 'pop3s', 1080: 'socks', 1433: 'ms-sql-s', 1434: 'ms-sql-m', 1494: 'ica',
-                 1512: 'wins', 1524: 'ingreslock', 1720: 'h323hostcall', 1812: 'radius', 1813: ' radius-acct ',
-                 1985: 'hsrp', 2008: 'Teamspeak 3 Accounting', 2049: 'nfs', 2102: 'zephyr-srv', 2103: 'zephyr-clt',
-                 2104: 'zephyr-hm', 2401: 'cvspserver', 2809: 'corbaloc', 3306: ' mysql ', 4321: 'rwhois',
-                 5999: 'cvsup', 6000: 'X11', 11371: 'pgpkeyserver', 13720: 'bprd', 13721: 'bpdbm', 13724: 'vnetd',
-                 13782: 'bpcd', 13783: 'vopied', 22273: 'wnn6', 23399: 'Skype', 25565: 'Minecraft', 26000: 'quake',
-                 33434: 'traceroute'}
+                     19: 'chargen', 20: 'ftp-data', 21: 'ftp', 22: 'ssh', 23: 'Telnet', 25: 'smtp', 37: 'time',
+                     39: 'rip',
+                     42: 'nameserver', 43: 'nicname', 49: 'tacacs', 50: 're-mail-ck', 53: 'domain', 70: 'gopher',
+                     71: 'genius', 79: 'finger', 80: 'http', 81: 'Torpark', 88: 'kerberos', 101: 'hostname',
+                     102: 'Iso-tsap', 105: 'csnet-ns', 107: 'rtelnet', 109: 'pop2', 110: 'pop3', 111: 'sunrpc',
+                     115: 'auth',
+                     117: 'uucp-path', 119: 'nntp', 123: 'ntp', 137: ' netbios-ns ', 138: 'netbios-dgm',
+                     139: 'netbios-ssn',
+                     143: 'imap', 162: 'snmptrap', 177: 'xdmcp', 179: 'bgp', 194: 'irc', 199: 'smux', 201: 'at-rtmp',
+                     209: 'qmtp', 210: 'z39.50', 213: 'ipx', 220: 'imap3', 369: 'rpc2portmap', 370: 'codaauth2',
+                     389: 'ldap', 427: 'svrloc', 443: 'https', 444: 'snpp', 445: ' microsoft-ds ', 464: 'kpasswd',
+                     512: 'exec', 513: 'login', 514: 'shell', 515: 'printer', 530: 'courier',
+                     531: 'conference', 532: 'netnews', 540: 'uucp', 543: 'klogin', 544: 'kshell', 547: 'dhcpv6-server',
+                     548: 'afpovertcp', 554: 'rtsp', 536: 'nntps', 587: 'submission', 631: 'ipp/cups',
+                     636: 'ldaps', 674: 'acap', 694: 'ha-cluster', 749: 'kerberos-adm', 873: 'rsync', 992: 'telnets',
+                     993: 'imaps', 995: 'pop3s', 1080: 'socks', 1287: 'routematch', 1433: 'ms-sql-s', 1434: 'ms-sql-m',
+                     1494: 'ica',
+                     1512: 'wins', 1524: 'ingreslock', 1720: 'h323hostcall', 1812: 'radius', 1813: ' radius-acct ',
+                     1985: 'hsrp', 2008: 'Teamspeak 3 Accounting', 2049: 'nfs', 2102: 'zephyr-srv', 2103: 'zephyr-clt',
+                     2104: 'zephyr-hm', 2401: 'cvspserver', 2809: 'corbaloc', 3306: ' mysql ', 4321: 'rwhois',
+                     5999: 'cvsup', 6000: 'X11', 11371: 'pgpkeyserver', 13720: 'bprd', 13721: 'bpdbm', 13724: 'vnetd',
+                     13782: 'bpcd', 13783: 'vopied', 22273: 'wnn6', 23399: 'Skype', 25565: 'Minecraft', 26000: 'quake',
+                     27017: 'MongoDB', 33434: 'traceroute'}
+
+
+def get_mac(ip):
+    arp_request = ARP(pdst=ip)
+    broadcast = Ether(dst="ff:ff:ff:ff:ff:ff")
+    arp_request_broadcast = broadcast / arp_request
+    answered_list = srp(arp_request_broadcast, timeout=5, verbose=False)[0]
+    return answered_list[0][1].hwsrc
 
 
 # Definition of the function get ping()
 def getPing(ip):
-    icmp = IP(dst=ip) / ICMP()
-    resp = sr1(icmp, timeout=timeout_icmp, verbose=0)
-    if resp is None:
-        print("[*] (Host Unreachable with ICMP)")
+    try:
+        if ip_address(self_ip) in ip_network(ip, strict=False):
+            ip_to_request, mask = ip.split('/', maxsplit=1)
+            try:
+                if get_mac(ip_to_request):
+                    return ip_to_request
+            except IndexError:
+                exit("[x] Target " + ip_to_request + " unreachable in your local network")
+        else:
+            icmp = IP(dst=ip) / ICMP()
+            resp = sr1(icmp, timeout=timeout_icmp, verbose=0)
+            if resp is None:
+                print("[*] (Host Unreachable with ICMP)")
+    except ValueError:
+        exit("[x] Invalid IP")
+    return ip
 
 
 # Definition of the function get getProtocol()
@@ -55,32 +85,111 @@ def getProtocol(port):
 
 
 # Definition of the function get getTime()
-def getTime(ip, startingPort, endingPort, timeout, fastscan):
+def getHead(protocol, ip, startingPortHost, endingPortHost, timeout, fastscan, typeOfTarget):
     waiting_time_sc = 0
     waiting_time_min = 0
     waiting_time_hour = 0
-    if fastscan == True:
-        waiting_time = ceil((int(endingPort) - int(startingPort)) + 1) * timeout + 6
-        waiting_time_sc = round(waiting_time % 60)
-        waiting_time_min = round(waiting_time // 60)
-        if waiting_time_min >= 60:
-            waiting_time_hour = round(waiting_time_min // 60)
-            waiting_time_min = round(waiting_time_min % 60)
-        print("[+] TCP Fast Scan " + ip + ", "+ str(endingPort) + " Ports referenced (≈ waiting " + str(
+    waiting_time = ceil((int(endingPortHost) - int(startingPortHost)) + 1) * timeout + 4
+    waiting_time_sc = round(waiting_time % 60)
+    waiting_time_min = round(waiting_time // 60)
+    if waiting_time_min >= 60:
+        waiting_time_hour = round(waiting_time_min // 60)
+        waiting_time_min = round(waiting_time_min % 60)
+
+    if fastscan == True and protocol == 'TCP':
+        print(
+            "[+] TCP Fast Scan " + ip + ", " + str(endingPortHost) + " Ports referenced (≈ waiting " + str(
+                waiting_time_hour) + " hour " + str(waiting_time_min) + " min " + str(waiting_time_sc) + " sc)")
+    elif protocol == 'TCP':
+        print("[+] TCP Scanning " + ip + " Port " + str(startingPortHost) + " to " + str(
+            endingPortHost) + " (≈ waiting " + str(
             waiting_time_hour) + " hour " + str(waiting_time_min) + " min " + str(waiting_time_sc) + " sc)")
+    elif protocol == 'ICMP':
+        print("[+] ICMP Scanning " + ip + ", " + str(endingPortHost) + " Hosts to scan (≈ waiting " + str(
+            waiting_time_hour) + " hour " + str(waiting_time_min) + " min " + str(waiting_time_sc) + " sc)")
+    elif protocol == 'ARP':
+        if typeOfTarget == 'network':
+            netwok = ip_network(ip)
+            print("[+] ARP Scanning network " + str(netwok) + " (≈ waiting " + str(
+                waiting_time_hour) + " hour " + str(waiting_time_min) + " min " + str(waiting_time_sc) + " sc)")
+        elif typeOfTarget == 'target':
+            print("[+] ARP request " + str(ip) + " (≈ waiting " + str(
+                waiting_time_hour) + " hour " + str(waiting_time_min) + " min " + str(waiting_time_sc) + " sc)")
     else:
-        waiting_time = ceil((int(endingPort) - int(startingPort)) + 1) * timeout + 6
-        waiting_time_sc = round(waiting_time % 60)
-        waiting_time_min = round(waiting_time // 60)
-        if waiting_time_min >= 60:
-            waiting_time_hour = round(waiting_time_min // 60)
-            waiting_time_min = round(waiting_time_min % 60)
-        print("[+] TCP Scanning " + ip + " Port " + str(startingPort) + " to " + str(endingPort) + " (≈ waiting " + str(
-            waiting_time_hour) + " hour " + str(waiting_time_min) + " min " + str(waiting_time_sc) + " sc)")
+        exit("[x] Error coding unknown protocol")
+
+
+def pingScan(network, timeout):
+    try:
+        addresses = IPv4Network(network)
+        hostsUp = 0
+        blockedHosts = 0
+        scannedHosts = 0
+        getHead('ICMP', network, 0, addresses.num_addresses, timeout_icmp, False, 'network')
+        for host in addresses:
+            if host in (addresses.network_address, addresses.broadcast_address):
+                pass
+            resp = sr1(IP(dst=str(host)) / ICMP(), timeout=timeout, verbose=0, )
+            if resp is None:
+                pass
+            elif int(resp.getlayer(ICMP).type) == 3 and int(resp.getlayer(ICMP).code) in [1, 2, 3, 9, 10, 13]:
+                print(f"[*] {host} is blocking ICMP.")
+                blockedHosts += 1
+            else:
+                print(f"[*] Host responding: {host}")
+                hostsUp += 1
+            scannedHosts += 1
+        print("[+] ICMP Scan End " + str(scannedHosts) + " host(s) scanned on " + network + ", " + str(
+            hostsUp) + " host(s) up, " + str(
+            blockedHosts) + " host(s) blocking ICMP")
+    except KeyboardInterrupt:
+        exit("[+] ICMP Scan Stopped " + str(scannedHosts) + " host(s) scanned on " + network + ", " + str(
+            hostsUp) + " host(s) up, " + str(
+            blockedHosts) + " host(s) blocking ICMP")
+    except ValueError:
+        exit("[x] Network address invalid")
+
+
+def ArpRequest(ip, timeout):
+    target = ip
+    target_ip = target.split('/')
+    target_ip_bytes = target_ip[0].split('.')
+    if target_ip_bytes[3] == '255':
+        print("[x] A single target cannot end by a 255")
+        exit()
+    if target_ip_bytes[3] == '0':
+        print("[*] (A target ending with a 0 may not respond)")
+    arp_r = ARP(pdst=target_ip)
+    br = Ether(dst='ff:ff:ff:ff:ff:ff')
+    request = br / arp_r
+    answered, unanswered = srp(request, timeout=timeout, verbose=0)
+    for i in answered:
+        print("[*] " + i[1].psrc + " responded: " + i[1].hwsrc.upper())
+    if str(len(answered)) == '1':
+        print("[+] ARP Request End, " + str(len(answered)) + " response(s) received from " + str(target_ip[0]))
+    else:
+        print("[x] ARP Request End, no response(s) received from " + str(target_ip[0]))
+
+
+def ArpScan(network, timeout):
+    try:
+        addresses = IPv4Network(network)
+        arp_r = ARP(pdst=network)
+        br = Ether(dst='ff:ff:ff:ff:ff:ff')
+        request = br / arp_r
+        answered, unanswered = srp(request, timeout=timeout, verbose=0)
+        for i in answered:
+            print("[*] " + i[1].psrc + "  <=====>  " + i[1].hwsrc.upper())
+        if str(len(answered)) >= '1':
+            print("[+] ARP Request End, " + str(len(answered)) + " response(s) received from " + str(network))
+        else:
+            print("[x] ARP Request End, no response(s) received from " + str(network))
+    except KeyboardInterrupt:
+        print("[+] ARP Request stopped, " + str(len(answered)) + " response(s) received from " + str(network))
 
 
 # Definition of the function get portsScan()
-def portsScan(startingPort, endingPort, ip):
+def TCPportsScan(startingPort, endingPort, ip):
     openPorts = 0
     closedOrFilteredPorts = 0
     portCount = 0
@@ -108,7 +217,7 @@ def portsScan(startingPort, endingPort, ip):
                 closedOrFilteredPorts) + " port(s) filtered/closed")
 
 
-def fastPortsScan(portList, ip):
+def fastTcpPortsScan(portList, ip):
     openPorts = 0
     closedOrFilteredPorts = 0
     portCount = 0
@@ -134,56 +243,18 @@ def fastPortsScan(portList, ip):
         exit()
 
 
-def ArpRequest(ip, timeout):
-    target = ip
-    target_ip = target.split('/')
-    target_ip_bytes = target_ip[0].split('.')
-    if target_ip_bytes[3] == '255':
-        print("[x] A single target cannot end by a 255")
-        exit()
-    if target_ip_bytes[3] == '0':
-        print("[*] (A target ending with a 0 may not respond)")
-    print("[+] ARP Request " + str(target_ip[0]))
-    arp_r = ARP(pdst=target_ip)
-    br = Ether(dst='ff:ff:ff:ff:ff:ff')
-    request = br / arp_r
-    answered, unanswered = srp(request, timeout=timeout, verbose=0)
-    for i in answered:
-        print("[*] " + i[1].psrc + "  <=====>  " + i[1].hwsrc.upper())
-    if str(len(answered)) == '1':
-        print("[+] ARP Request End, " + str(len(answered)) + " response(s) received from " + str(target_ip[0]))
-    else:
-        print("[x] ARP Request End, no response(s) received from " + str(target_ip[0]))
-
-
-def ArpScan(network, timeout):
-    try:
-        network_ip, mask = network.split('/')
-    except ValueError:
-        print("[x] Please input a mask 'X.X.X.0/mask'")
-        exit()
-    print("[+] ARP Scanning Network " + network)
-    arp_r = ARP(pdst=network)
-    br = Ether(dst='ff:ff:ff:ff:ff:ff')
-    request = br / arp_r
-    answered, unanswered = srp(request, timeout=timeout, verbose=0)
-    for i in answered:
-        print("[*] " + i[1].psrc + "  <=====>  " + i[1].hwsrc.upper())
-    if str(len(answered)) >= '1':
-        print("[+] ARP Request End, " + str(len(answered)) + " response(s) received from " + str(network))
-    else:
-        print("[x] ARP Request End, no response(s) received from " + str(network))
-
-
 try:
     if len(sys.argv) < 2:
-        print("No parameters selected, use '-h' for help")
-        exit()
+        exit("[x] No parameters selected, use '-h' for help")
     else:
         if sys.argv[1] == '-h':
             print("[*] Help")
+            print(
+                "[*] If the script output 'WARNING: Mac address to reach destination not found. Using broadcast.' use ARP Scan instead of ICMP Scan or put the mask on a single target")
             print(" ICMP Scan:")
-            print("   - Input '-ICMP' (not available for the moment)")
+            print("   - Input '-ICMP'")
+            print("   - Select a network to scan with '-n' Ex: '... -ICMP -n 192.168.1.0/24'")
+            print("     (if you want to scan your local network use ARP Scan instead it's faster =D )")
             print(" ARP Scan:")
             print("   - Input '-ARP'")
             print("   - Select a network to scan with '-n' Ex: '... -ARP -n 192.168.1.0/24'")
@@ -199,86 +270,115 @@ try:
             print("   - Input '-UDP' (not available for the moment)")
             exit()
         elif sys.argv[1] == '-ICMP':
-            print("[*] ICMP scan not available for the moment sry =D")
-            exit()
+            try:
+                if sys.argv[2] == '-n':
+                    try:
+                        target_network = sys.argv[3]
+
+                        if ip_address(self_ip) in ip_network(target_network, strict=False):
+                            exit("[x] For scan you local Network use the ARP Scan instead")
+                        else:
+                            target_network_ip, target_network_mask = target_network.split('/', maxsplit=1)
+                            pingScan(target_network, timeout_icmp)
+                    except ValueError:
+                        exit("[x] Please input a mask for the network Ex: '... -n 192.168.1.0/24'")
+                else:
+                    exit("[x] Unknown parameter(s) '" + str(
+                        sys.argv[2]) + "' use '-n' for input a network")
+            except IndexError:
+                exit("[x] Please input a network with '-n' Ex : '... -ICMP -n 192.168.1.0/24'")
         elif sys.argv[1] == '-ARP':
             try:
                 if sys.argv[2] == '-n':
                     try:
                         target_network = sys.argv[3]
-                        target_network_ip, target_network_mask = target_network.split('/', maxsplit=1)
-                        ArpScan(target_network, timeout_arp)
+                        network_addresses = IPv4Network(target_network)
+
+                        if ip_address(self_ip) in ip_network(network_addresses):
+                            getHead('ARP', target_network, 1, 1, timeout_arp, True, 'network')
+                            ArpScan(target_network, timeout_arp)
+                        else:
+                            exit("[x] ARP Scan is only available on you local network")
                     except ValueError:
-                        print("[x] Please input a mask for the network Ex: '... -n 192.168.1.0/24'")
-                        exit()
+                        exit(
+                            "[x] Network address " + target_network + " invalid look at the mask or the network number")
                 elif sys.argv[2] == '-t':
                     target_ip = sys.argv[3]
-                    ArpRequest(target_ip, timeout_arp)
+                    target_ip_split = target_ip.split('/', maxsplit=1)
+                    try:
+                        if target_ip_split[1]:
+                            if ip_address(self_ip) in ip_network(target_ip, strict=False):
+                                getHead('ARP', target_ip, 1, 1, timeout_arp, True, 'target')
+                                ArpRequest(target_ip, timeout_arp)
+                            else:
+                                exit("[x] ARP request is only available on you local network")
+                    except IndexError:
+                        exit("[x] Please Input a mask on the target")
                 else:
-                    print("[x] Unknown parameter(s) '" + str(
+                    exit("[x] Unknown parameter(s) '" + str(
                         sys.argv[2]) + "' use '-n' for input a network or a target with '-t'")
-                    exit()
             except IndexError:
-                print("[x] Please input a network with '-n' or a target with '-t' Ex : '... -t/-n 192.168.0.1/24'")
-                exit()
+                exit("[x] Please input a network with '-n' or a target with '-t' Ex : '... -t/-n 192.168.0.1/24'")
         elif sys.argv[1] == '-TCP':
             try:
                 if sys.argv[2] == '-t':
                     target_ip = sys.argv[3]
+                    target_ip_split = target_ip.split('/', maxsplit=1)
+                    try:
+                        if target_ip_split[1]:
+                            if ip_address(self_ip) not in ip_network(target_ip, strict=False):
+                                exit("[x] Please don't input a mask if the ip is out of your local network")
+                    except IndexError:
+                        if ip_address(self_ip) in ip_network(target_ip, strict=False):
+                            getHead('ARP', target_ip, 1, 1, timeout_arp, True, 'target')
+                            ArpRequest(target_ip, timeout_arp)
                     try:
                         if sys.argv[4] == '-r':
                             try:
                                 ports = sys.argv[5].split('-', maxsplit=1)
                                 firstPort = int(ports[0])
                                 lastPort = int(ports[1])
+                                if lastPort < 1:
+                                    exit("[x] Please input a starting port over 0")
+                                if lastPort > 65535:
+                                    exit("[x] Please input a ending port under 65536")
                             except IndexError:
-                                print("[x] Please input a port range after '-r' format: '1-65535' (scanning port 1 to "
-                                      "65535)")
-                                exit()
+                                exit("[x] Please input a port range after '-r' format: '1-65535' (scanning port 1 to "
+                                     "65535)")
                         elif sys.argv[4] == '-p':
                             try:
                                 firstPort = int(sys.argv[5])
                                 lastPort = int(sys.argv[5])
                             except IndexError:
-                                print("[x] Please input a port after '-p' ")
-                                exit()
+                                exit("[x] Please input a port after '-p' ")
                             except ValueError:
-                                print("[x] Please input a port after '-p' ")
-                                exit()
+                                exit("[x] Please input a port after '-p' ")
                         elif sys.argv[4] == '-f':
-                            getPing(target_ip)
-                            getTime(target_ip, 1, len(port_protocol_tcp), timeout_tcp, fastscan=True)
-                            fastPortsScan(port_protocol_tcp, target_ip)
+                            target_ip = getPing(target_ip)
+                            getHead('TCP', target_ip, 1, len(port_protocol_tcp), timeout_tcp, True, 'target')
+                            fastTcpPortsScan(port_protocol_tcp, target_ip)
                             exit()
                         else:
-                            print("[x] Unknown parameter(s) '" + str(
+                            exit("[x] Unknown parameter(s) '" + str(
                                 sys.argv[
                                     4]) + "' use '-p' for scan a single port or '-r' for select a range of ports or '-f' for select the fast scan")
-                            exit()
                     except IndexError:
                         firstPort = 1
                         lastPort = 1024
-                    getPing(target_ip)
-                    getTime(target_ip, firstPort, lastPort, timeout_tcp, fastscan=False)
-                    portsScan(firstPort, lastPort, target_ip)
+                    target_ip = getPing(target_ip)
+                    getHead('TCP', target_ip, firstPort, lastPort, timeout_tcp, False, 'target')
+                    TCPportsScan(firstPort, lastPort, target_ip)
                 else:
-                    print("[x] Unknown parameter(s) '" + str(sys.argv[2]) + "' use '-t' for input a target")
-                    exit()
+                    exit("[x] Unknown parameter(s) '" + str(sys.argv[2]) + "' use '-t' for input a target")
             except IndexError:
-                print("[x] Please input a target with '-t' Ex: '... -t 192.168.1.1'")
-                exit()
+                exit("[x] Please input a target with '-t' Ex: '... -t 192.168.1.1'")
         elif sys.argv[1] == '-UDP':
-            print("[*] UDP scan not available for the moment sry =D")
-            exit()
+            exit("[*] UDP scan not available for the moment sry =D")
         else:
-            print("[x] Unknown parameter(s) '" + str(sys.argv[1]) + "' use '-h' for help")
-            exit()
+            exit("[x] Unknown parameter(s) '" + str(sys.argv[1]) + "' use '-h' for help")
 except PermissionError:
-    print("[x] Please run the script as root")
-    exit()
+    exit("[x] Please run the script as root")
 except socket.gaierror:
-    print("[x] Ip target(s) or network invalid")
-    exit()
+    exit("[x] Ip target(s) or network invalid")
 except OSError:
-    print("[x] Ip target(s) or network invalid")
-    exit()
+    exit("[x] Ip target(s) or network invalid")
