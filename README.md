@@ -55,6 +55,7 @@ python3 DoorScan.py -TCP -t 192.168.1.254/24 -p 22
 ``` 
 python3 DoorScan.py -TCP -t 192.168.1.254/24 -f
 ```
+
 (This option scan all ports referenced in the 'port_protocol_tcp' list in which you can add known ports to them if you wish)
 # Bugs and problems : 
 Please if you find a problem, or a bug let me know =D.
