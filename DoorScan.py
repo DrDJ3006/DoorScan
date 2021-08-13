@@ -1,10 +1,14 @@
 #!/usr/bin/python3
-from scapy.all import *
-from os import system, name
-from math import *
-from ipaddress import *
-import random
-import socket
+try:
+    from scapy.all import *
+    from os import system, name
+    from math import *
+    from ipaddress import *
+    import random
+    import socket
+except ModuleNotFoundError:
+    print("[x] Error of module please launch 'pip3 install -r requirements.txt'")
+    exit("[*] If you find any problems,errors or bugs please contact me at 'https://github.com/DrDJ3006'")
 
 self_ip = [ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][0]
 target_ip = 0
@@ -57,21 +61,18 @@ def get_mac(ip):
 
 # Definition of the function get ping()
 def getPing(ip):
-    try:
-        if ip_address(self_ip) in ip_network(ip, strict=False):
-            ip_to_request, mask = ip.split('/', maxsplit=1)
-            try:
-                if get_mac(ip_to_request):
-                    return ip_to_request
-            except IndexError:
-                exit("[x] Target " + ip_to_request + " unreachable in your local network")
-        else:
-            icmp = IP(dst=ip) / ICMP()
-            resp = sr1(icmp, timeout=timeout_icmp, verbose=0)
-            if resp is None:
-                print("[*] (Host Unreachable with ICMP)")
-    except ValueError:
-        exit("[x] Invalid IP")
+    if ip_address(self_ip) in ip_network(ip, strict=False):
+        ip_to_request, mask = ip.split('/', maxsplit=1)
+        try:
+            if get_mac(ip_to_request):
+                return ip_to_request
+        except IndexError:
+            exit("[x] Target '" + ip_to_request + "' is unreachable in your local network")
+    else:
+        icmp = IP(dst=ip) / ICMP()
+        resp = sr1(icmp, timeout=timeout_icmp, verbose=0)
+        if resp is None:
+            print("[*] (Host Unreachable with ICMP)")
     return ip
 
 
@@ -133,7 +134,7 @@ def pingScan(network, timeout):
             if resp is None:
                 pass
             elif int(resp.getlayer(ICMP).type) == 3 and int(resp.getlayer(ICMP).code) in [1, 2, 3, 9, 10, 13]:
-                print(f"[*] {host} is blocking ICMP.")
+                print(f"[*] Host blocking ICMP: {host}")
                 blockedHosts += 1
             else:
                 print(f"[*] Host responding: {host}")
@@ -146,19 +147,14 @@ def pingScan(network, timeout):
         exit("[+] ICMP Scan Stopped " + str(scannedHosts) + " host(s) scanned on " + network + ", " + str(
             hostsUp) + " host(s) up, " + str(
             blockedHosts) + " host(s) blocking ICMP")
-    except ValueError:
-        exit("[x] Network address invalid")
 
 
 def ArpRequest(ip, timeout):
     target = ip
     target_ip = target.split('/')
     target_ip_bytes = target_ip[0].split('.')
-    if target_ip_bytes[3] == '255':
-        print("[x] A single target cannot end by a 255")
-        exit()
     if target_ip_bytes[3] == '0':
-        print("[*] (A target ending with a 0 may not respond)")
+        print("[*] (A single target ending by a 0 may not respond)")
     arp_r = ARP(pdst=target_ip)
     br = Ether(dst='ff:ff:ff:ff:ff:ff')
     request = br / arp_r
@@ -245,27 +241,30 @@ def fastTcpPortsScan(portList, ip):
 
 try:
     if len(sys.argv) < 2:
-        exit("[x] No parameters selected, use '-h' for help")
+        exit(
+            "[x] No parameter(s) selected, use protocol scan available: ('-TCP', '-ARP', '-ICMP'), or use option: '-h' ")
     else:
         if sys.argv[1] == '-h':
-            print("[*] Help")
             print(
-                "[*] If the script output 'WARNING: Mac address to reach destination not found. Using broadcast.' use ARP Scan instead of ICMP Scan or put the mask on a single target")
+                "\n(If the script output: 'WARNING: Mac address to reach destination not found. Using broadcast.' use ARP Scan instead of ICMP Scan or put the mask on a single target)")
+            print("(If you find any problems,errors or bugs please contact me at 'https://github.com/DrDJ3006')")
+            print("\n[*] Help")
             print(" ICMP Scan:")
             print("   - Input '-ICMP'")
-            print("   - Select a network to scan with '-n' Ex: '... -ICMP -n 192.168.1.0/24'")
+            print("   - Select a network to scan with '-n', (Ex: '... -ICMP -n 192.168.2.0/24')")
             print("     (if you want to scan your local network use ARP Scan instead it's faster =D )")
             print(" ARP Scan:")
             print("   - Input '-ARP'")
-            print("   - Select a network to scan with '-n' Ex: '... -ARP -n 192.168.1.0/24'")
-            print("   - Select a single target to request with '-t' Ex: '... -ARP -t 192.168.1.254'")
+            print("   - Select a network to scan with '-n', Ex: ('... -ARP -n 192.168.1.0/24')")
+            print("   - Select a single target to request with '-t', Ex: ('... -ARP -t 192.168.1.254/24')")
             print(" TCP (Ports) Scan:")
             print("   - Input '-TCP'")
             print(
-                "   - Select a target to scan with '-t' Ex: '... -TCP -t 192.168.1.254' (default port scan 1 to 1024) ")
-            print("   - Select the fast scan with '-f' Ex: '... -TCP -t 192.168.1.254 -f'")
-            print("   - Select the port range to scan with '-r' Ex: '... -TCP -t 192.168.1.254 -r 1-65535'")
-            print("   - Select a single port to scan with '-p' Ex: '... -TCP -t 192.168.1.254 -p 22'")
+                "   - Select a target to scan with '-t', Ex: ('... -TCP -t 192.168.1.254/24') (default port scan 1 to 1024) ")
+            print(
+                "   - Select the fast scan with '-f', Ex: ('... -TCP -t 192.168.1.254/24 -f') (This option scan all ports referenced in the 'port_protocol_tcp' list in which you can add known ports to them if you wish)")
+            print("   - Select the port range to scan with '-r', Ex: ('... -TCP -t 192.168.1.254/24 -r 1-65535')")
+            print("   - Select a single port to scan with '-p', Ex: ('... -TCP -t 192.168.1.254/24 -p 22')")
             print(" UDP (Ports) Scan:")
             print("   - Input '-UDP' (not available for the moment)")
             exit()
@@ -274,51 +273,58 @@ try:
                 if sys.argv[2] == '-n':
                     try:
                         target_network = sys.argv[3]
-
                         if ip_address(self_ip) in ip_network(target_network, strict=False):
                             exit("[x] For scan you local Network use the ARP Scan instead")
                         else:
                             target_network_ip, target_network_mask = target_network.split('/', maxsplit=1)
                             pingScan(target_network, timeout_icmp)
                     except ValueError:
-                        exit("[x] Please input a mask for the network Ex: '... -n 192.168.1.0/24'")
+                        exit("[x] Invalid IP network: '" + target_network + "', look at the network ip and the mask (network ip often end by a 0)")
+                    except IndexError:
+                        exit("[x] No ICMP network selected, please input a network to scan after '-n', Ex: ('... -ICMP -n 192.168.2.0/24')")
                 else:
                     exit("[x] Unknown parameter(s) '" + str(
-                        sys.argv[2]) + "' use '-n' for input a network")
+                        sys.argv[2]) + "', use ('-n') for input a network, Ex: ('... -ICMP -n 192.168.2.0/24')")
             except IndexError:
-                exit("[x] Please input a network with '-n' Ex : '... -ICMP -n 192.168.1.0/24'")
+                exit("[x] No ICMP parameter(s) selected, please input a network to scan with ('-n')")
         elif sys.argv[1] == '-ARP':
             try:
                 if sys.argv[2] == '-n':
                     try:
                         target_network = sys.argv[3]
-                        network_addresses = IPv4Network(target_network)
-
-                        if ip_address(self_ip) in ip_network(network_addresses):
-                            getHead('ARP', target_network, 1, 1, timeout_arp, True, 'network')
-                            ArpScan(target_network, timeout_arp)
-                        else:
-                            exit("[x] ARP Scan is only available on you local network")
+                        addresses = IPv4Network(target_network)
+                        target_network_ip, target_network_mask = target_network.split('/', maxsplit=1)
+                        if target_network_mask:
+                            if ip_address(self_ip) in ip_network(target_network, strict=False):
+                                getHead('ARP', target_network, 1, 1, timeout_arp, True, 'network')
+                                ArpScan(target_network, timeout_arp)
+                            else:
+                                exit("[x] ARP Scan is only available on your local network, use ICMP scan instead")
+                    except IndexError:
+                        exit("[x] No ARP network selected, please input a network to scan after '-n', Ex: ('... -ARP -n 192.168.1.0/24')")
+                    except AddressValueError:
+                        exit("[x] Invalid IP network: '" + target_network + "', please look at the ip format or the mask (the mask is mandatory for the ARP Scan) ")
                     except ValueError:
-                        exit(
-                            "[x] Network address " + target_network + " invalid look at the mask or the network number")
+                        exit("[x] Invalid IP network: '" + target_network + "', please look if the ip is corresponding to the mask (the mask is mandatory for the ARP Scan, ip network often end by a 0)")
                 elif sys.argv[2] == '-t':
-                    target_ip = sys.argv[3]
-                    target_ip_split = target_ip.split('/', maxsplit=1)
                     try:
-                        if target_ip_split[1]:
+                        target_ip = sys.argv[3]
+                        target_ipv4, target_mask = target_ip.split('/', maxsplit=1)
+                        if target_mask:
                             if ip_address(self_ip) in ip_network(target_ip, strict=False):
                                 getHead('ARP', target_ip, 1, 1, timeout_arp, True, 'target')
                                 ArpRequest(target_ip, timeout_arp)
                             else:
                                 exit("[x] ARP request is only available on you local network")
+                    except ValueError:
+                        exit("[x] Invalid IP target: '" + target_ip + "', please look at the ip format or the mask (the mask is mandatory for the ARP Scan) ")
                     except IndexError:
-                        exit("[x] Please Input a mask on the target")
+                        exit("[x] No ARP target selected, please input a target to request after '-t', Ex: ('... -ARP -t 192.168.1.1/24')")
                 else:
-                    exit("[x] Unknown parameter(s) '" + str(
-                        sys.argv[2]) + "' use '-n' for input a network or a target with '-t'")
+                    exit("[x] Unknown parameter(s) '" + str(sys.argv[2]) + "', use ('-n') for input a network, or input a target with: ('-t'), Ex : ('... -n 192.168.1.0/24') or ('... -t 192.168.1.254/24')")
             except IndexError:
-                exit("[x] Please input a network with '-n' or a target with '-t' Ex : '... -t/-n 192.168.0.1/24'")
+                exit(
+                    "[x] No ARP parameter(s) selected, please input a network to scan with: ('-n'), or input a target to request with ('-t')")
         elif sys.argv[1] == '-TCP':
             try:
                 if sys.argv[2] == '-t':
@@ -327,41 +333,50 @@ try:
                     try:
                         if target_ip_split[1]:
                             if ip_address(self_ip) not in ip_network(target_ip, strict=False):
-                                exit("[x] Please don't input a mask if the ip is out of your local network")
+                                exit("[x] Please don't enter the mask if the target ip is not in your local network")
                     except IndexError:
-                        if ip_address(self_ip) in ip_network(target_ip, strict=False):
-                            getHead('ARP', target_ip, 1, 1, timeout_arp, True, 'target')
-                            ArpRequest(target_ip, timeout_arp)
+                        try:
+                            if ip_address(self_ip) in ip_network(target_ip, strict=False):
+                                getHead('ARP', target_ip, 1, 1, timeout_arp, True, 'target')
+                                ArpRequest(target_ip, timeout_arp)
+                        except ValueError:
+                            exit("[x] Invalid IP target: '" + target_ip + "', please look at the ip format or the mask")
+                    except ValueError:
+                        exit("[x] Invalid IP target: '" + target_ip + "', please look at the ip format or the mask")
                     try:
                         if sys.argv[4] == '-r':
                             try:
                                 ports = sys.argv[5].split('-', maxsplit=1)
                                 firstPort = int(ports[0])
                                 lastPort = int(ports[1])
-                                if lastPort < 1:
-                                    exit("[x] Please input a starting port over 0")
-                                if lastPort > 65535:
-                                    exit("[x] Please input a ending port under 65536")
+                                if int(firstPort) > 65535 or int(firstPort) < 1:
+                                    exit("[x] Invalid fist port of range : '" + str(firstPort) + "', use a number between 1 and 65535")
+                                elif int(lastPort) > 65535 or int(lastPort) < 1:
+                                    exit("[x] Invalid last port of range: '" + str(lastPort) + "', use a number between 1 and 65535")
                             except IndexError:
-                                exit("[x] Please input a port range after '-r' format: '1-65535' (scanning port 1 to "
-                                     "65535)")
+                                exit("[x] Please input a port range after '-r', with this format: ('... -t 192.168.1.1 -r 1-65535') (Scanning port 1 to port 65535)")
+                            except ValueError:
+                                exit("[x] Invalid port range: '" + sys.argv[
+                                    5] + "', use this format: (' ... -r {1-655535}-{1-655535} ')")
                         elif sys.argv[4] == '-p':
                             try:
+                                if int(sys.argv[5]) > 65535 or int(sys.argv[5]) < 1:
+                                    exit("[x] Invalid port number: '" + sys.argv[
+                                        5] + "', use a number between 1 and 65535")
                                 firstPort = int(sys.argv[5])
                                 lastPort = int(sys.argv[5])
                             except IndexError:
-                                exit("[x] Please input a port after '-p' ")
+                                exit(
+                                    "[x] Please input a port range after '-p', with this format: ('... -t 192.168.1.1 -p 80 ') (Scanning only the port 80)")
                             except ValueError:
-                                exit("[x] Please input a port after '-p' ")
+                                exit("[x] Invalid Port: '" + sys.argv[5] + "', use a number between 1 and 65535")
                         elif sys.argv[4] == '-f':
                             target_ip = getPing(target_ip)
                             getHead('TCP', target_ip, 1, len(port_protocol_tcp), timeout_tcp, True, 'target')
                             fastTcpPortsScan(port_protocol_tcp, target_ip)
                             exit()
                         else:
-                            exit("[x] Unknown parameter(s) '" + str(
-                                sys.argv[
-                                    4]) + "' use '-p' for scan a single port or '-r' for select a range of ports or '-f' for select the fast scan")
+                            exit("[x] Unknown parameter(s) '" + str(sys.argv[4]) + "' use '-p' for scan a single port or '-r' for select a range of ports or '-f' for select the fast scan")
                     except IndexError:
                         firstPort = 1
                         lastPort = 1024
@@ -369,13 +384,13 @@ try:
                     getHead('TCP', target_ip, firstPort, lastPort, timeout_tcp, False, 'target')
                     TCPportsScan(firstPort, lastPort, target_ip)
                 else:
-                    exit("[x] Unknown parameter(s) '" + str(sys.argv[2]) + "' use '-t' for input a target")
+                    exit("[x] Unknown parameter(s) '" + str(sys.argv[2]) + "', use ('-t') for input a target , Ex: ('... -TCP -t 192.168.1.1/24')")
             except IndexError:
-                exit("[x] Please input a target with '-t' Ex: '... -t 192.168.1.1'")
+                exit("[x] No TCP parameter(s) selected, please input a target to scan with ('-t')")
         elif sys.argv[1] == '-UDP':
             exit("[*] UDP scan not available for the moment sry =D")
         else:
-            exit("[x] Unknown parameter(s) '" + str(sys.argv[1]) + "' use '-h' for help")
+            exit("[x] Unknown parameter(s) '" + str(sys.argv[1]) + "', protocol scan available: ('-TCP', '-ARP', '-ICMP')")
 except PermissionError:
     exit("[x] Please run the script as root")
 except socket.gaierror:

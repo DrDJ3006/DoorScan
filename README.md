@@ -2,7 +2,7 @@
 
 # DoorScan :
 
-DoorScan is a simple Scan Script using python3 and the scapy library
+DoorScan is a simple scan script using python3 and scapy library
 # Installation & dependencies :
 ## Dependencies :
 - Python 3.5+
@@ -38,7 +38,7 @@ python3 DoorScan.py -ARP -n 192.168.1.0/24
 python3 DoorScan.py -ARP -t 192.168.1.254
 ``` 
 ### TCP (Ports) Scan:
-if you scan a target in your local network input a mask with the IP
+if you scan a target in your local network input a mask with the IP address 
 - Select a target to scan with '-t' 
 ``` 
 python3 DoorScan.py -TCP -t 192.168.1.254/24 (default port scan 1 to 1024) 
@@ -54,7 +54,8 @@ python3 DoorScan.py -TCP -t 192.168.1.254/24 -p 22
 - Select the fast scan with '-f'
 ``` 
 python3 DoorScan.py -TCP -t 192.168.1.254/24 -f
-``` 
+```
+(This option scan all ports referenced in the 'port_protocol_tcp' list in which you can add known ports to them if you wish)
 # Bugs and problems : 
 Please if you find a problem, or a bug let me know =D.
 # legal disclaimer:
