@@ -58,7 +58,10 @@ python3 DoorScan.py -TCP -t 192.168.1.254/24 -f
 
 (This option scan all ports referenced in the 'port_protocol_tcp' list in which you can add known ports to them if you wish)
 # Bugs and problems : 
-Please if you find a problem, or a bug let me know =D.
+- if there are errors during import of scapy run this command :
+``` 
+sudo apt-get install python3-scapy
+```
 # legal disclaimer:
 Usage of DoorScan for attacking targets without prior mutual consent is illegal. 
 It's the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program. 
