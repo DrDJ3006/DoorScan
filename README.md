@@ -1,5 +1,3 @@
-
-
 # DoorScan :
 
 DoorScan is a simple scan script using python3 and scapy library
