@@ -54,7 +54,7 @@ python3 DoorScan.py -TCP -t 192.168.1.254/24 -p 22
 python3 DoorScan.py -TCP -t 192.168.1.254/24 -f
 ```
 
-(This option scan all ports referenced in the 'port_protocol_tcp' list in which you can add known ports to them if you wish)
+(This option scan all ports referenced in the '**port_protocol_tcp**' list in which you can add known ports to them if you wish)
 # Bugs and problems : 
 - if there are errors during import of scapy run this command :
 ``` 
