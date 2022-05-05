@@ -1,6 +1,6 @@
 # DoorScan :
 
-DoorScan is a simple scan script using python3 and scapy library
+DoorScan is a simple scan script using python3 and scapy library, this script is not powerful as nmap but it help to understand how ARP and TCP scan works 
 # Installation & dependencies :
 ## Dependencies :
 - Python 3.5+
